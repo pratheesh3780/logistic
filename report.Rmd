@@ -1,0 +1,107 @@
+---
+title: "Linear Regression Analysis"
+author: "GRAPES-KAU"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(shinyWidgets)
+library(shinycssloaders)
+library(tidyverse)
+library(caret)
+library(ggplot2)
+library(rmarkdown)
+library(knitr)
+```
+## RESULT
+LINEAR REGRESSION ANALYSIS
+
+```{r, echo = FALSE}
+csvfile <- reactive({
+    csvfile <- input$file1
+    if (is.null(csvfile)){return(NULL)}
+    dt <- read.csv(csvfile$datapath, header=input$header, sep=",")
+    dt
+  })
+
+if(input$submit > 0){
+      d=as.data.frame(csvfile())
+      y<-subset(d,select=input$yvar)
+      x<-subset(d,select=input$xvar)
+      data1<-cbind(y,x)
+      
+      # Split the data into training and test set
+      set.seed(123)
+      training.samples <- data1[,1] %>%
+        createDataPartition(p = 0.8, list = FALSE)
+      train.data  <- data1[training.samples, ]
+      test.data <- data1[-training.samples, ]
+      colnames(train.data)[1] <- "independent"
+     model <- lm(train.data$independent~., data = train.data)
+      final<-summary(model)$coef
+      colnam<-c("Estimate","Std.Error","t value","P-value")
+      colnames(final)<-colnam
+      final
+      kable(final,caption = "Regression Analysis",digits=3,align='c')
+}
+tags$br()
+
+if(input$submit > 0){
+  HTML(paste0("<b>"," Regression co-efficients with P-value <0.05 are significant (alpha = 0.05) ","</b>"))
+  
+} 
+
+tags$br()
+
+if(input$submit > 0){
+  d=as.data.frame(csvfile())
+  y<-subset(d,select=input$yvar)
+  x<-subset(d,select=input$xvar)
+  data1<-cbind(y,x)
+  
+  # Split the data into training and test set
+  set.seed(123)
+  training.samples <- data1[,1] %>%
+    createDataPartition(p = 0.8, list = FALSE)
+  train.data  <- data1[training.samples, ]
+  test.data <- data1[-training.samples, ]
+  colnames(train.data)[1] <- "independent"
+  model <- lm(train.data$independent~., data = train.data)
+  sum<-summary(model)
+  R_squared<-sum$r.squared
+  adj_R_squared<-sum$adj.r.squared
+  Residual_Standard_Error<-sum$sigma
+  result<-as.data.frame(cbind(R_squared,adj_R_squared,Residual_Standard_Error))
+  result
+  kable(result,caption = "Model Accuracy",digits=3,align='c')
+}
+tags$br()
+
+ags$br()
+
+```
+
+
+
+
+
+Report generated from: **GRAPES**
+
+
+Developed by:
+
+**Dr. Pratheesh P. Gopinath**
+
+**Dr. Aswathy Vijayan**
+
+**Dr. Durga A. R.**
+
+**Agricultural Statistics & Agricultural Economics**
+
+**Kerala Agricultural University**
+
+
+
+
