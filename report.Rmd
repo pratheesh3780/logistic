@@ -1,5 +1,5 @@
 ---
-title: "Linear Regression Analysis"
+title: "Logistic Regression Analysis"
 author: "GRAPES-KAU"
 output: html_document
 ---
@@ -27,24 +27,25 @@ csvfile <- reactive({
   })
 
 if(input$submit > 0){
+      input$reload
+      Sys.sleep(2)
       d=as.data.frame(csvfile())
       y<-subset(d,select=input$yvar)
       x<-subset(d,select=input$xvar)
       data1<-cbind(y,x)
-      
-      # Split the data into training and test set
-      set.seed(123)
-      training.samples <- data1[,1] %>%
-        createDataPartition(p = 0.8, list = FALSE)
-      train.data  <- data1[training.samples, ]
-      test.data <- data1[-training.samples, ]
-      colnames(train.data)[1] <- "independent"
-     model <- lm(train.data$independent~., data = train.data)
+      colnames(data1)[1] <- "y"
+      model <- glm(as.factor(data1$y)~., data = data1, family=binomial)
+      sum<-summary(model)
+      coeff<-as.data.frame(sum$coefficients)
+      est<-coeff[,1]
+      oddsratio<-exp(est)
+      oddsratio[1]<-0
       final<-summary(model)$coef
-      colnam<-c("Estimate","Std.Error","t value","P-value")
-      colnames(final)<-colnam
-      final
-      kable(final,caption = "Regression Analysis",digits=3,align='c')
+      final1<-as.data.frame(cbind(final,oddsratio))
+      colnam<-c("Estimate","Std.Error","z value","P-value","Odds ratio")
+      colnames(final1)<-colnam
+      final1
+      kable(final1,caption = "Logistic Regression Analysis",digits=3,align='c')
 }
 tags$br()
 
@@ -54,32 +55,8 @@ if(input$submit > 0){
 } 
 
 tags$br()
-
-if(input$submit > 0){
-  d=as.data.frame(csvfile())
-  y<-subset(d,select=input$yvar)
-  x<-subset(d,select=input$xvar)
-  data1<-cbind(y,x)
-  
-  # Split the data into training and test set
-  set.seed(123)
-  training.samples <- data1[,1] %>%
-    createDataPartition(p = 0.8, list = FALSE)
-  train.data  <- data1[training.samples, ]
-  test.data <- data1[-training.samples, ]
-  colnames(train.data)[1] <- "independent"
-  model <- lm(train.data$independent~., data = train.data)
-  sum<-summary(model)
-  R_squared<-sum$r.squared
-  adj_R_squared<-sum$adj.r.squared
-  Residual_Standard_Error<-sum$sigma
-  result<-as.data.frame(cbind(R_squared,adj_R_squared,Residual_Standard_Error))
-  result
-  kable(result,caption = "Model Accuracy",digits=3,align='c')
-}
 tags$br()
-
-ags$br()
+tags$br()
 
 ```
 

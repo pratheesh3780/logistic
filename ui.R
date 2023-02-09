@@ -52,22 +52,15 @@ ui <- fluidPage(
                         htmlOutput('text1'),
                         tags$br(),
                         tags$br(),
-                        tableOutput('regtab1'),
-                        tags$br(),
-                        tags$br(),
                         uiOutput('var2')
                       ),
              
              tabPanel(tags$b("Plots and Graphs"),
-                      sidebarPanel( uiOutput('var1')),
-                      mainPanel(tags$br(),
-                                plotOutput('regplot')%>% withSpinner(color="#0dc5c1")),
-                      tags$br(),
                       htmlOutput('text2')
              ),
              
              tabPanel(tags$b("Read me"),
-                      htmlOutput('text3')
+                      withMathJax(includeMarkdown("logistic.md"))
              ) 
              
              
